@@ -1,15 +1,14 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import express, { Request, Response } from "express";
+import bodyParser from "body-parser";
+import { filterImageFromURL, deleteLocalFiles } from "./util/util";
 
 (async () => {
-
   // Init the Express application
   const app = express();
 
   // Set the network port
   const port = process.env.PORT || 8082;
-  
+
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
 
@@ -31,32 +30,30 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   //! END @TODO1
 
-  app.get("/filteredimage", async(req,res)=>{
-    const {image_url}=req.query;
-    if(image_url){
-      filterImageFromURL(image_url)
-      .then(result=>{
-        const image_path=result;
+  app.get("/filteredimage", async (req: Request, res: Response) => {
+    const image_url: string = req.query.image_url;
+    if (image_url) {
+      filterImageFromURL(image_url).then((result: string) => {
+        const image_path = result;
         res.sendFile(image_path);
-        res.on("close",()=>{
-          deleteLocalFiles([image_path])
-        })
-      })
-    }else{
-      res.send("Invalid parameters")
+        res.on("close", () => {
+          deleteLocalFiles([image_path]);
+        });
+      });
+    } else {
+      res.status(422).send("Invalid parameters");
     }
-  })
-  
+  });
+
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
-    res.send("try GET /filteredimage?image_url={{}}")
-  } );
-  
+  app.get("/", async (req: Request, res: Response) => {
+    res.send("try GET /filteredimage?image_url={{}}");
+  });
 
   // Start the Server
-  app.listen( port, () => {
-      console.log( `server running http://localhost:${ port }` );
-      console.log( `press CTRL+C to stop server` );
-  } );
+  app.listen(port, () => {
+    console.log(`server running http://localhost:${port}`);
+    console.log(`press CTRL+C to stop server`);
+  });
 })();
