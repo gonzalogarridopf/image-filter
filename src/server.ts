@@ -30,6 +30,22 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   /**************************************************************************** */
 
   //! END @TODO1
+
+  app.get("/filteredimage", async(req,res)=>{
+    const {image_url}=req.query;
+    if(image_url){
+      filterImageFromURL(image_url)
+      .then(result=>{
+        const image_path=result;
+        res.sendFile(image_path);
+        res.on("close",()=>{
+          deleteLocalFiles([image_path])
+        })
+      })
+    }else{
+      res.send("Invalid parameters")
+    }
+  })
   
   // Root Endpoint
   // Displays a simple message to the user
